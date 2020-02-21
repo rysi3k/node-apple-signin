@@ -99,7 +99,7 @@ const getAppleSigningKey = (kid) => {
   return new Promise((resolve, reject) => {
     jwksClient.getSigningKey(kid, (err, key) => {
       if (err) {
-        reject(err);        
+        reject(err);
       } else {
         resolve(key);
       }
@@ -107,7 +107,7 @@ const getAppleSigningKey = (kid) => {
   });
 }
 
-const verifyIdToken = async (idToken, clientID) => {
+const verifyIdToken = async (idToken, clientID = undefined, {ignoreExpiration = false} = {}) => {
   const decodedIdToken = jwt.decode(idToken, { complete: true });
   const { kid, alg } = decodedIdToken.header;
   const key = await getAppleSigningKey(kid);
@@ -115,8 +115,9 @@ const verifyIdToken = async (idToken, clientID) => {
   const jwtClaims = jwt.verify(idToken, publicKey, {
     issuer: TOKEN_ISSUER,
     audience: clientID,
-    algorithms: [alg]
-  });  
+    algorithms: [alg],
+    ignoreExpiration
+  });
 
   return jwtClaims;
 };
