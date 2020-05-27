@@ -109,6 +109,9 @@ const getAppleSigningKey = (kid) => {
 
 const verifyIdToken = async (idToken, clientID = undefined, {ignoreExpiration = false} = {}) => {
   const decodedIdToken = jwt.decode(idToken, { complete: true });
+  if (!decodedIdToken) {
+    throw new jwt.JsonWebTokenError('invalid token');
+  }
   const { kid, alg } = decodedIdToken.header;
   const key = await getAppleSigningKey(kid);
   const publicKey = key.getPublicKey();
